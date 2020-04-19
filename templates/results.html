@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+{%  block head %}
+    <title> Main Page </title>
+{% endblock %}
+{%  block body %}
+<div class="row  items-center">
+	<div class="card bg-light mb-3" class="col-sm-6">
+		<div class="card-header text-center">
+			<h4>
+				<span style="float: left"><b> ID: </b> {{user.id}}  </span>
+				<b>  Name: </b> {{user.name}}
+				<span style="float: right"><b> Phone: </b> 0{{user.phone}} </span>
+			</h4>
+		</div>
+		<div class="card-body">
+			<h4><b> Start Date: </b> {{start_date}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+			<span style="float: right"><b> End Date: </b> {{end_date}} </span></h4>
+		</div>
+	</div>
+</div>
+<br>
+
+{% for place in places %}
+<div class="row  items-center">
+	<div class="card border-dark mb-3" class="col-sm-6">
+		<div class="card-header">
+			<h4> {{place.date}} </h4>
+		</div>
+		<div class="card-body">
+		  <h4 class="card-title">ID</h4>
+		  <p class="card-text">{{place.user_id}}</p>
+		  <a href="#" class="btn btn-info stretched-link">Show List</a>
+		  <a href="#" class="btn btn-secondary stretched-link">Show Map --- {{count}}</a>
+		</div>
+	</div>
+</div>
+{% endfor %}
+{% endblock %}
