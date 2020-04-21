@@ -17,9 +17,9 @@
 
     <form method="POST" action="{{url_for('search')}}">
          <div class="form-group row text-center">
-		    <label for="inputText" class="col-sm-4 col-xs-4 text-right col-form-label">Enter ID or Phone number:</label>
+		    <label for="inputText" class="col-sm-4 col-xs-4 text-right col-form-label">Enter ID:</label>
 			<div class="col-sm-4 col-xs-6">
-                <input class="form-control" type="text" placeholder="ID or Phone number" id="inputText" name="user_id" required>
+                <input class="form-control" type="text" placeholder="ID number" id="inputText" name="user_id" required>
             </div>
          </div>
 
@@ -35,7 +35,7 @@
 
          <div class="form-group row center-block">
             <div class="col-sm-12 col-xs-12 text-center">
-                <input type="submit" class="btn btn-primary" value=" Search " style="width:15%" >
+                <input type="submit" class="btn btn-success" value=" Search " style="width:15%" >
             </div>
         </div>
     </form>

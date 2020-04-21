@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
 	<style type="text/css">
+		body {
+			background-image: linear-gradient(to right, rgba(0,50,0,0), rgba(0,50,0,1));
+		}
 		.card {
-			width: 40%;
+			width: 50%;
 	        margin: 0 auto; /* Added */
 	        float: none; /* Added */
 	        margin-bottom: 10px; /* Added */
@@ -22,9 +25,11 @@
 <body>
 	<br><br>
 	<div class="mx-auto d-block text-center">
-		<img  src="{{ url_for('static', filename='images/coroLogo.png') }}"  alt="">
+		<img  src="{{ url_for('static', filename='images/coroLogo11.jpg') }}" style="width: 50%; height: 150px;"  alt="">
 	</div>
     <br> <br>
     {%  block body %} {% endblock %}
+
+    {%  block js %} {% endblock %}
 </body>
 </html>

@@ -17,7 +17,7 @@ class ShowMap():
 		self.names = names
 
 	def getMap(self):
-		
+
 		fig = go.Figure(go.Scattermapbox(
 		        lat=self.lats,
 		        lon=self.lons,
@@ -33,7 +33,7 @@ class ShowMap():
 		    autosize=True,
 		    hovermode='closest',
 		    mapbox=dict(
-		        accesstoken=mapbox_access_token,
+		        accesstoken=self.mapbox_access_token,
 		        bearing=0,
 		        center=dict(
 		            lat=self.mlat,

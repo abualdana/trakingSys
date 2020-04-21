@@ -3,7 +3,7 @@
 from flask import Flask, render_template, request, redirect, flash
 from setupdb import Base, User, Location
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine, asc, func
+from sqlalchemy import create_engine, asc, func, or_
 from datetime import datetime, timedelta
 from math import sin, cos, sqrt, atan2, radians
 from showMap import ShowMap
@@ -41,12 +41,11 @@ def search():
 			# distance in KM
 			distance *= 1000
 			return distance 
-
-
+		user_id = request.form['user_id']
 		contacts = {}
 		start_date = datetime.strptime(request.form['start_date'], '%Y-%m-%d').date()
 		end_date = datetime.strptime(request.form['end_date'], '%Y-%m-%d').date() +  timedelta(days=1)
-		user = session.query(User).filter_by(id=request.form['user_id']).one()
+		user = session.query(User).filter_by(id=int(user_id)).one()
 
 		places = session.query(Location).filter(Location.date >= start_date).\
 					filter(Location.date <= end_date).filter_by(user_id=user.id).all()
@@ -68,11 +67,11 @@ def search():
 								temp.append(move.lat)
 								temp.append(move.lng)
 								temp.append(move.date)
-								for user in allUsers:
-									if user.id == move.user_id:
-										temp.append(user.id)
-										temp.append(user.name)
-										temp.append(user.phone)
+								for u in allUsers:
+									if u.id == move.user_id:
+										temp.append(u.id)
+										temp.append(u.name)
+										temp.append(u.phone)
 				if len(temp):
 					tempDict[place.id].append(temp)
 			contacts.update(tempDict)
@@ -91,7 +90,43 @@ def search():
 
 @app.route('/map', methods=['POST', 'GET'])
 def map():
-	pass
+	length = request.form['length']
+	mname = request.form['mname']
+	mlat = request.form['mlat']
+	mlng = request.form['mlng']
+	lats = []
+	lats.append(mlat)
+	lons = []
+	lons.append(mlng)
+	names = []
+	names.append(mname)
+	contacts = [[] for i in range(int(length))]
+	if(length):
+		for i in range(int(length)):
+			contacts[i].append(request.form['cont'+ str(i)+'lat'])
+			contacts[i].append(request.form['cont'+ str(i)+'lng'])
+			contacts[i].append(request.form['cont'+ str(i)+'name'])
+
+		for lst in contacts:
+			lats.append(lst[0])
+			lons.append(lst[1])
+			names.append(lst[2])
+
+		
+
+	show = ShowMap(float(mlat), float(mlng), lats, lons, names)
+	show.getMap()
+
+
+	return render_template('testMap.html',
+			mname = mname,
+			mlat = mlat,
+			mlng = mlng,
+			length = length,
+			lons = lons,
+			lats = lats,
+			names = names,
+			contacts = contacts)
 
 
 if __name__ == "__main__":

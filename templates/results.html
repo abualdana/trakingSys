@@ -1,16 +1,16 @@
 {% extends 'layout.html' %}
 {%  block head %}
-    <title> Main Page </title>
+    <title> Tracking Page </title>
 {% endblock %}
 {%  block body %}
 <div class="row justify-content-center text-center">
-	<div class="col-sm-4 col-xs-6">
+	<div class="col-sm-6 col-xs-6">
   		<a href="/" class="btn btn-secondary" style="width: 20%; float: left;"> back </a>
   	</div>
 </div>
 <br><br>
 <div class="row  items-center">
-	<div class="card bg-light mb-3" class="col-sm-6">
+	<div class="card bg-light  mb-3" class="col-sm-6">
 		<div class="card-header text-center">
 			<h4>
 				<span style="float: left"><b> ID: </b> {{user.id}}  </span>
@@ -27,9 +27,9 @@
 <br>
 {% for place in places %}
 		<div class="row  items-center">
-			<div class="card border-dark mb-3" class="col-sm-6">
+			<div class="card border-success bg-light mb-3" class="col-sm-6">
 				<div class="card-header">
-					<h4> {{place.date}} </h4>
+					<h4> {{place.date}} <span style="float: right;">Location</span></h4>
 				</div>
 				<div class="card-body">
 				  <h4 class="card-title">Number of suspected contacts: 
@@ -54,7 +54,27 @@
 					{% endfor %}
 					</ul></h5>
 				  </p>
-				  <a href="#" class="btn btn-info stretched-link">Show on map</a>
+				   	<form method="POST" action="{{url_for('map')}}">
+						<div class="form-group row text-center">
+							<div class="col-sm-12 col-xs-12">
+								{% for key in contacts.keys() %}
+								{% if key == place.id %}
+								<input class="form-control" type="hidden"  name="length" value="{{contacts[key]|length}}">
+								{% for i in range(contacts[key]|length) %}
+									<input class="form-control" type="hidden"  name="cont{{i}}lat" value="{{contacts[key][i][1]}}">
+									<input class="form-control" type="hidden"  name="cont{{i}}lng" value="{{contacts[key][i][2]}}">
+									<input class="form-control" type="hidden"  name="cont{{i}}name" value="{{contacts[key][i][5]}}">
+								{% endfor %}
+								{% endif %}
+								{% endfor %}
+								<input class="form-control" type="hidden"  name="mlat" value="{{place.lat}}">
+								<input class="form-control" type="hidden"  name="mlng" value="{{place.lng}}">
+								<input class="form-control" type="hidden"  name="mname" value="{{user.name}}">
+							    <input type="submit" class="btn btn-primary" formtarget="_blank" value=" Show on map " style="float: left" >
+							</div>
+						    
+						</div>
+				    </form>
 				</div>
 			</div>
 		</div>
@@ -65,4 +85,17 @@
 	  	</div>
 	</div>
 {% endfor %}
+{% endblock %}
+{%  block js %} 
+<script type="text/javascript">
+	$('#exampleModal').on('show.bs.modal', function (event) {
+	  var button = $(event.relatedTarget) // Button that triggered the modal
+	  var recipient = button.data('whatever') // Extract info from data-* attributes
+	  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+	  // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+	  var modal = $(this)
+	  modal.find('.modal-title').text('New message to ' + recipient)
+	  modal.find('.modal-body input').val(recipient)
+	})
+</script>
 {% endblock %}
