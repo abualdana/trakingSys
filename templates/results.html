@@ -2,7 +2,7 @@
 {%  block head %}
     <title> Tracking Page </title>
 {% endblock %}
-{%  block body %}
+{%  block body %}  
 <div class="row justify-content-center text-center">
 	<div class="col-sm-6 col-xs-6">
   		<a href="/" class="btn btn-secondary" style="width: 20%; float: left;"> back </a>
@@ -12,19 +12,34 @@
 <div class="row  items-center">
 	<div class="card bg-light  mb-3" class="col-sm-6">
 		<div class="card-header text-center">
-			<h4>
-				<span style="float: left"><b> ID: </b> {{user.id}}  </span>
-				<b>  Name: </b> {{user.name}}
-				<span style="float: right"><b> Phone: </b> 0{{user.phone}} </span>
-			</h4>
+			<h3><span style="font-family: Times New Roman, Times, serif;"> Personal Information: </span></h3>
+			<h4> <span style="float: left"><b> Start Date: </b> {{start_date}} </span>
+			<span style="float: right"><b> End Date: </b> {{end_date}} </span></h4>			
 		</div>
-		<div class="card-body">
-			<h4><b> Start Date: </b> {{start_date}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-			<span style="float: right"><b> End Date: </b> {{end_date}} </span></h4>
+		<div class="card-body text-center">
+		<img  src="{{ url_for('static', filename='images/')}}{{user.id}}.jpg" style="width: 15em; height: 15em;"  alt=""> <br><br>
+			<table  class="table table-hover text-left"> 
+				<tr>
+					<td><b> ID: </b> {{user.id}} </td>
+					<td><b>  Name: </b> {{user.name}} </td>
+				</tr>
+				<tr>
+					<td><b> Phone: </b> 0{{user.phone}} </td>
+					<td><b> DOB: </b> {{user.dob}} </td>
+				</tr>
+				<tr>
+					<td><b> Place of Birth: </b> {{user.dplace}} </td>
+					<td><b> Nationality: </b> {{user.nationality}} </td>
+				</tr>
+			</table>
 		</div>
 	</div>
 </div>
 <br>
+<div class="text-center">
+	<h2 style="font-family: Times New Roman, Times, serif;"> Discoverd visited places: </h2>
+</div>
+								
 {% for place in places %}
 		<div class="row  items-center">
 			<div class="card border-success bg-light mb-3" class="col-sm-6">
@@ -40,19 +55,30 @@
 					{% endfor %}
 				  </h4>
 				  <p class="card-text">
-				  	<h5><ul>
 				  	{% for key in contacts.keys() %}
-			  			{% if key == place.id %}
-			  				{% for i in range(contacts[key]|length) %}
-				  				<li>
-				  					<b> ID: </b>  {{contacts[key][i][4]}} &nbsp;&nbsp;&nbsp;&nbsp;
-				  					<b> Name: </b>	 {{contacts[key][i][5]}} &nbsp;&nbsp;&nbsp;&nbsp;
-				  					<b> Phone: </b>	 0{{contacts[key][i][6]}} 
-				  				</li>
+			  			{% if key == place.id %}			  			
+			  				<div class="card-group">
+		  					{% for i in range(contacts[key]|length) %}
+  								<div class="col-sm-3">
+					  				<div class="card w-100">
+									    	<div class="card-body">
+										    	<img  src="{{ url_for('static', filename='images/') }}{{contacts[key][i][4]}}.jpg" style="width: 100%; height: 100%;"  alt="">
+										    	<hr>
+										    	
+						  					<small><b> ID: </b>  		{{contacts[key][i][4]}} </small> <br>
+						  					<small><b> Name: </b>	 	{{contacts[key][i][5]}}</small> <br>
+						  					<small><b> Phone: </b>	 	0{{contacts[key][i][6]}} </small><br>
+						  					<small><b> Datetime: </b> 		{{contacts[key][i][3]}}</small><br>
+						  					<small><b> DOB: </b>	 	{{contacts[key][i][7]}} </small><br>
+						  					<small><b> Dplace: </b> 		{{contacts[key][i][8]}}</small><br>
+						  					<small><b> Nationality: </b>	{{contacts[key][i][9]}}</small><br>
+					  					</div>
+									</div>
+								</div>
 			  				{% endfor %}
+							</div>
 			  			{% endif %}
 					{% endfor %}
-					</ul></h5>
 				  </p>
 				   	<form method="POST" action="{{url_for('map')}}">
 						<div class="form-group row text-center">
@@ -70,7 +96,40 @@
 								<input class="form-control" type="hidden"  name="mlat" value="{{place.lat}}">
 								<input class="form-control" type="hidden"  name="mlng" value="{{place.lng}}">
 								<input class="form-control" type="hidden"  name="mname" value="{{user.name}}">
-							    <input type="submit" class="btn btn-primary" formtarget="_blank" value=" Show on map " style="float: left" >
+							   	 <input type="submit" class="btn btn-success" formtarget="_blank" value=" Show on map " style="float: left" >
+							  <!-- Button trigger modal -->
+									<button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal{{place.id}}" style="float:right;">
+									  Send SMS
+									</button>
+
+									<!-- Modal -->
+									<div class="modal fade" id="exampleModal{{place.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									  <div class="modal-dialog" role="document">
+									    <div class="modal-content">
+									      <div class="modal-header">
+										<h5 class="modal-title" id="exampleModalLabel">T<b>o:</b>
+										{% for key in contacts.keys() %}
+								  			{% if key == place.id %}	
+							  					{% for i in range(contacts[key]|length) %}
+											  					0{{contacts[key][i][6]}};
+								  				{% endfor %}
+								  			{% endif %}
+										{% endfor %}
+										</h5>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+										  <span aria-hidden="true">&times;</span>
+										</button>
+									      </div>
+									      <div class="modal-body">
+										<textarea class="form-control" rows="4"> </textarea>
+									      </div>
+									      <div class="modal-footer">
+										<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+										<button type="button" class="btn btn-primary">Send SMS</button>
+									      </div>
+									    </div>
+									  </div>
+									</div>						
 							</div>
 						    
 						</div>
@@ -84,18 +143,5 @@
 	  		<h4> No contacts found! </h4>
 	  	</div>
 	</div>
-{% endfor %}
-{% endblock %}
-{%  block js %} 
-<script type="text/javascript">
-	$('#exampleModal').on('show.bs.modal', function (event) {
-	  var button = $(event.relatedTarget) // Button that triggered the modal
-	  var recipient = button.data('whatever') // Extract info from data-* attributes
-	  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-	  // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-	  var modal = $(this)
-	  modal.find('.modal-title').text('New message to ' + recipient)
-	  modal.find('.modal-body input').val(recipient)
-	})
-</script>
+{% endfor %}  
 {% endblock %}

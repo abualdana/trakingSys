@@ -1,7 +1,7 @@
 # !/usr/bin/env python
 
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -15,6 +15,9 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False)
+    dob = Column(Date)
+    dplace = Column(String(100), nullable=False)
+    nationality = Column(String(100), nullable=False)
     phone = Column(Integer)
 
 
@@ -23,7 +26,9 @@ class Location(Base):
 
     lat = Column(String(50), nullable=False)
     lng = Column(String(50), nullable=False)
+    lng = Column(String(50), nullable=False)
     date = Column(DateTime)
+    location = Column(String(100), nullable=False)
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)

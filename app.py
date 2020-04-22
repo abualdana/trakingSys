@@ -1,4 +1,4 @@
-# !/usr/bin/env python
+# !/usr/bin/env python3
 
 from flask import Flask, render_template, request, redirect, flash
 from setupdb import Base, User, Location
@@ -72,17 +72,21 @@ def search():
 										temp.append(u.id)
 										temp.append(u.name)
 										temp.append(u.phone)
+										temp.append(u.dob)
+										temp.append(u.dplace)
+										temp.append(u.nationality)
 				if len(temp):
 					tempDict[place.id].append(temp)
 			contacts.update(tempDict)
-
+		end_date = datetime.strptime(request.form['end_date'], '%Y-%m-%d').date()
 
 		return render_template('results.html',
 			user = user,
 			places = places,
 			start_date = start_date,
 			end_date = end_date,
-			contacts = contacts)
+			contacts = contacts,
+			show_predictions_modal=True)
 	except:
 		message = "No data is found for \"" + str(request.form['user_id']) +'"'
 		flash(message)
