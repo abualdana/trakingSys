@@ -37,14 +37,13 @@
 </div>
 <br>
 <div class="text-center">
-	<h2 style="font-family: Times New Roman, Times, serif;"> Discoverd visited places: </h2>
-</div>
-								
+	<h2 style="font-family: Times New Roman, Times, serif;"> Discovered visited places: </h2>
+</div>				
 {% for place in places %}
 		<div class="row  items-center">
 			<div class="card border-success bg-light mb-3" class="col-sm-6">
 				<div class="card-header">
-					<h4> {{place.date}} <span style="float: right;">Location</span></h4>
+					<h4> {{place.date}} <span style="float: right;"><i class="fas fa-map-marker-alt" style="color:green;" ></i> {{place.location}}</span></h4>
 				</div>
 				<div class="card-body">
 				  <h4 class="card-title">Number of suspected contacts: 
@@ -68,10 +67,68 @@
 						  					<small><b> ID: </b>  		{{contacts[key][i][4]}} </small> <br>
 						  					<small><b> Name: </b>	 	{{contacts[key][i][5]}}</small> <br>
 						  					<small><b> Phone: </b>	 	0{{contacts[key][i][6]}} </small><br>
-						  					<small><b> Datetime: </b> 		{{contacts[key][i][3]}}</small><br>
+						  					<small><b> Datetime: </b> 	{{contacts[key][i][3]}}</small><br>
 						  					<small><b> DOB: </b>	 	{{contacts[key][i][7]}} </small><br>
-						  					<small><b> Dplace: </b> 		{{contacts[key][i][8]}}</small><br>
+						  					<small><b> Dplace: </b> 	{{contacts[key][i][8]}}</small><br>
 						  					<small><b> Nationality: </b>	{{contacts[key][i][9]}}</small><br>
+						  					
+						  					{% if users_history[contacts[key][i][4]] | length > 0 %}
+							  					<!-- Button trigger modal History -->
+												<a type="button"  data-toggle="modal" data-target="#exampleModal{{contacts[key][i][4]}}" style="color: red;" >
+												  Times of Contacts: {{users_history[contacts[key][i][4]] | length}}
+												</a>
+
+												<!-- Modal History -->
+												<div 	class="modal fade" id="exampleModal{{contacts[key][i][4]}}" tabindex="-1" role="dialog" 
+													aria-labelledby="exampleModalLabel" aria-hidden="true">
+												  <div class="modal-dialog modal-lg" role="document">
+												    <div class="modal-content">
+												      <div class="modal-header">
+													<h4 class="modal-title" id="exampleModalLabel"> Below is a list of <b> {{user.name}} </b> and <b>{{contacts[key][i][5]}}</b>s' contacts history:</h4>
+													<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+													  <span aria-hidden="true">&times;</span>
+													</button>
+												      </div>
+												      <div class="modal-body">
+														<table  class="table table-hover text-left">
+															<tr>
+																<th> Time </th>
+																<th> Date </th>
+																<th> Place </th>
+																<th> Show on Map </th>
+															</tr>
+															{% for times in users_history[contacts[key][i][4]] %}
+																<tr>
+																	<td> {{times[0]}} </td>
+																	<td> {{times[1]}} </td>
+																	<td> {{times[2]}} </td>
+																	<td> 
+																		<form method="POST" action="{{url_for('map')}}">
+																			<input class="form-control" type="hidden"  name="length" value="history">
+																			<input class="form-control" type="hidden"  name="mname" value="{{user.name}}">
+																			<input class="form-control" type="hidden"  name="mlat" value="{{times[5]}}">
+																			<input class="form-control" type="hidden"  name="mlng" value="{{times[6]}}">
+																			<input class="form-control" type="hidden"  name="lat" value="{{times[3]}}">
+																			<input class="form-control" type="hidden"  name="lng" value="{{times[4]}}">
+																			<input class="form-control" type="hidden"  name="name" value="{{contacts[key][i][5]}}">
+																			<button type="submit" class="btn btn-danger" formtarget="_blank" title="Show on Map">
+																				<i class="fas fa-map-marked-alt " style="color:#FCE2DD;"></i>
+																			</button>
+																			</form>
+																	</td>
+																</tr>
+															{% endfor %}													
+														</table>
+												      </div>
+												      <div class="modal-footer">
+													<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+												      </div>
+												    </div>
+												  </div>
+												</div>
+											{% else %}
+												<span style="color: green;" > First time to meet </span>
+											{% endif %}
 					  					</div>
 									</div>
 								</div>
@@ -96,7 +153,8 @@
 								<input class="form-control" type="hidden"  name="mlat" value="{{place.lat}}">
 								<input class="form-control" type="hidden"  name="mlng" value="{{place.lng}}">
 								<input class="form-control" type="hidden"  name="mname" value="{{user.name}}">
-							   	 <input type="submit" class="btn btn-success" formtarget="_blank" value=" Show on map " style="float: left" >
+							   	<input type="submit" class="btn btn-success" formtarget="_blank" value=" Show on map " style="float: left" >
+							   	
 							  <!-- Button trigger modal -->
 									<button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal{{place.id}}" style="float:right;">
 									  Send SMS
@@ -111,7 +169,7 @@
 										{% for key in contacts.keys() %}
 								  			{% if key == place.id %}	
 							  					{% for i in range(contacts[key]|length) %}
-											  					0{{contacts[key][i][6]}};
+											  		<span class="badge badge-success" style="background-color: green" >0{{contacts[key][i][6]}};</span>
 								  				{% endfor %}
 								  			{% endif %}
 										{% endfor %}

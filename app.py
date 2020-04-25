@@ -40,7 +40,27 @@ def search():
 			distance = R * c
 			# distance in KM
 			distance *= 1000
-			return distance 
+			return distance
+		
+		# Get all places original user visited and compare the distance with specific location (1)
+		def userHistoryPlaces(usr_id, lat, lng, u_date):
+			history = session.query(Location).filter_by(user_id=usr_id).all()
+			for place in history:
+				list_location = []
+				if place.date > u_date:
+					time = place.date - u_date
+				else:
+					time = u_date - place.date
+					
+				if place.date.date() == u_date.date():
+					if distance(float(place.lat), float(place.lng), float(lat), float(lng)) < 20:
+						if time.total_seconds() / 60**2 < 1:
+							list_location.append(place.lat)
+							list_location.append(place.lng)
+							return list_location
+			return list_location
+			    
+
 		user_id = request.form['user_id']
 		contacts = {}
 		start_date = datetime.strptime(request.form['start_date'], '%Y-%m-%d').date()
@@ -51,6 +71,12 @@ def search():
 					filter(Location.date <= end_date).filter_by(user_id=user.id).all()
 		moves = session.query(Location).all()
 		allUsers = session.query(User).all()
+		
+		# Collect IDs of all contacts (2)
+		id_all_contacts = []
+		current_date_all_contacts = []
+		
+		
 		for place in places:
 			tempDict = {place.id: []}
 			for move in moves:
@@ -67,9 +93,11 @@ def search():
 								temp.append(move.lat)
 								temp.append(move.lng)
 								temp.append(move.date)
+								current_date_all_contacts.append(move.date)
 								for u in allUsers:
 									if u.id == move.user_id:
 										temp.append(u.id)
+										id_all_contacts.append(u.id)
 										temp.append(u.name)
 										temp.append(u.phone)
 										temp.append(u.dob)
@@ -79,14 +107,39 @@ def search():
 					tempDict[place.id].append(temp)
 			contacts.update(tempDict)
 		end_date = datetime.strptime(request.form['end_date'], '%Y-%m-%d').date()
-
+		
+		# loop through users IDs to get all history with the guy we are searching for (3)
+		users_history ={}
+		if len(id_all_contacts):
+			for id_user in id_all_contacts:
+				temp_dict = {id_user: []}
+				temp_list = []
+				user_history = session.query(Location).filter_by(user_id= id_user).all()
+				for user_place in user_history:
+					if user_place.date not in current_date_all_contacts:
+						main_user = userHistoryPlaces(user_id, user_place.lat, user_place.lng, user_place.date)
+						if len(main_user):
+							temp_list.append(user_place.date.time())
+							temp_list.append(user_place.date.date())
+							temp_list.append(user_place.location)
+							temp_list.append(user_place.lat)
+							temp_list.append(user_place.lng)							
+							temp_list.append(main_user[0]) # lat
+							temp_list.append(main_user[1]) # lng
+						
+					if len(temp_list):
+						temp_dict[id_user].append(temp_list)
+					users_history.update(temp_dict)
+					temp_list = []
+			    
+		
 		return render_template('results.html',
 			user = user,
 			places = places,
 			start_date = start_date,
 			end_date = end_date,
 			contacts = contacts,
-			show_predictions_modal=True)
+			users_history = users_history)
 	except:
 		message = "No data is found for \"" + str(request.form['user_id']) +'"'
 		flash(message)
@@ -104,8 +157,8 @@ def map():
 	lons.append(mlng)
 	names = []
 	names.append(mname)
-	contacts = [[] for i in range(int(length))]
-	if(length):
+	if(length and length != 'history'):
+		contacts = [[] for i in range(int(length))]
 		for i in range(int(length)):
 			contacts[i].append(request.form['cont'+ str(i)+'lat'])
 			contacts[i].append(request.form['cont'+ str(i)+'lng'])
@@ -116,21 +169,16 @@ def map():
 			lons.append(lst[1])
 			names.append(lst[2])
 
-		
+	if(length == 'history'):
+		lats.append(request.form['lat'])
+		lons.append(request.form['lng'])
+		names.append(request.form['name'])
 
 	show = ShowMap(float(mlat), float(mlng), lats, lons, names)
 	show.getMap()
 
 
-	return render_template('testMap.html',
-			mname = mname,
-			mlat = mlat,
-			mlng = mlng,
-			length = length,
-			lons = lons,
-			lats = lats,
-			names = names,
-			contacts = contacts)
+	return render_template('testMap.html')
 
 
 if __name__ == "__main__":
